@@ -1,0 +1,356 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--foreground);
+}
+
+.filters {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.ingredientsSection label,
+.selectWrapper label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.ingredientInput {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ingredientInput input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.addBtn {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  background: var(--primary-hover);
+}
+
+.ingredientList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ingredientTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--secondary);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.ingredientTag button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--primary);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ingredientTag button:hover {
+  opacity: 1;
+}
+
+.selectGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.selectWrapper select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+}
+
+.searchBtn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.searchBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.searchBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.recipes {
+  display: grid;
+  gap: 2rem;
+}
+
+.recipeCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.recipeCard h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--foreground);
+}
+
+.description {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  background: var(--secondary);
+  color: var(--primary);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.ingredients,
+.instructions {
+  margin-bottom: 1.5rem;
+}
+
+.ingredients h3,
+.instructions h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.ingredients ul,
+.instructions ol {
+  padding-left: 1.5rem;
+  line-height: 1.8;
+}
+
+.ingredients li {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.instructions li {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.cookBtn,
+.favoriteBtn,
+.calendarBtn,
+.shoppingBtn,
+.shareBtn {
+  padding: 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.cookBtn {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.cookBtn:hover {
+  background: var(--primary-hover);
+}
+
+.favoriteBtn {
+  background: var(--secondary);
+  color: var(--primary);
+}
+
+.favoriteBtn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.calendarBtn {
+  background: white;
+  color: var(--foreground);
+}
+
+.calendarBtn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.shoppingBtn {
+  background: white;
+  color: var(--foreground);
+}
+
+.shoppingBtn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.shareBtn {
+  background: white;
+  color: var(--foreground);
+}
+
+.shareBtn:hover {
+  background: var(--secondary);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+}
+
+.modalContent h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.modalContent p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.confirmBtn,
+.cancelBtn {
+  flex: 1;
+  padding: 0.875rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.confirmBtn {
+  background: var(--primary);
+  color: white;
+}
+
+.confirmBtn:hover {
+  background: var(--primary-hover);
+}
+
+.cancelBtn {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.cancelBtn:hover {
+  background: var(--sidebar-hover);
+}
+
+@media (max-width: 768px) {
+  .selectGroup {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

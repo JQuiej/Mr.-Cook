@@ -1,0 +1,240 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--background);
+  z-index: 2000;
+  overflow-y: auto;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.125rem;
+  color: var(--primary);
+  cursor: pointer;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--primary-hover);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+.progress {
+  font-size: 1.125rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.ingredientsSection {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+
+.ingredientsSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.ingredientsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ingredient {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ingredient:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.amount {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.name {
+  color: var(--foreground);
+  font-size: 1rem;
+}
+
+.stepSection {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3rem;
+}
+
+.stepNumber {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.stepInstruction {
+  font-size: 1.5rem;
+  line-height: 2;
+  color: var(--foreground);
+  margin-bottom: 2rem;
+}
+
+.timer {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 2rem 0;
+  padding: 2rem;
+  background: var(--secondary);
+  border-radius: 12px;
+}
+
+.timerButtons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.timerBtn {
+  padding: 0.875rem;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--foreground);
+  transition: all 0.2s;
+}
+
+.timerBtn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.navigation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.navBtn {
+  padding: 1.25rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.navBtn:disabled {
+  background: var(--border);
+  color: #999;
+  cursor: not-allowed;
+}
+
+.complete {
+  text-align: center;
+  padding: 2rem;
+  background: var(--secondary);
+  border-radius: 12px;
+}
+
+.complete p {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+.doneBtn {
+  padding: 1rem 3rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.doneBtn:hover {
+  background: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .ingredientsSection {
+    position: static;
+  }
+
+  .stepInstruction {
+    font-size: 1.25rem;
+  }
+
+  .timerButtons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .navigation {
+    grid-template-columns: 1fr;
+  }
+}
