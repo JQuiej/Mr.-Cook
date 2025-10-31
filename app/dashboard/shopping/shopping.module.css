@@ -327,3 +327,24 @@
     width: 100%;
   }
 }
+
+.recipeGroup {
+  margin-bottom: 2rem;
+}
+
+.recipeGroupTitle {
+  color: #ff8c00;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #fff8f0 0%, #ffe4cc 100%);
+  border-radius: 8px;
+  border-left: 4px solid #ff8c00;
+}
+
+.recipeItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-left: 1rem;
+}

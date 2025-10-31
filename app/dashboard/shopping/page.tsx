@@ -222,32 +222,51 @@ export default function ShoppingPage() {
                     No hay ingredientes en esta lista
                   </p>
                 ) : (
-                  currentList.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className={`${styles.item} ${
-                        item.checked ? styles.checked : ''
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={item.checked}
-                        onChange={() => toggleItem(item.id)}
-                      />
-                      <div className={styles.itemInfo}>
-                        <span className={styles.itemName}>{item.name}</span>
-                        <span className={styles.itemAmount}>
-                          {item.amount} {item.unit}
-                        </span>
+                  (() => {
+                    // Agrupar items por receta
+                    const grouped = currentList.items.reduce((acc, item) => {
+                      const recipe = item.recipeSource || 'Otros ingredientes';
+                      if (!acc[recipe]) acc[recipe] = [];
+                      acc[recipe].push(item);
+                      return acc;
+                    }, {} as Record<string, ShoppingListItem[]>);
+
+                    return Object.entries(grouped).map(([recipeName, items]) => (
+                      <div key={recipeName} className={styles.recipeGroup}>
+                        <h3 className={styles.recipeGroupTitle}>
+                          🍽️ {recipeName}
+                        </h3>
+                        <div className={styles.recipeItems}>
+                          {items.map((item) => (
+                            <div
+                              key={item.id}
+                              className={`${styles.item} ${
+                                item.checked ? styles.checked : ''
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={item.checked}
+                                onChange={() => toggleItem(item.id)}
+                              />
+                              <div className={styles.itemInfo}>
+                                <span className={styles.itemName}>{item.name}</span>
+                                <span className={styles.itemAmount}>
+                                  {item.amount} {item.unit}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => deleteItem(item.id)}
+                                className={styles.deleteItemBtn}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <button
-                        onClick={() => deleteItem(item.id)}
-                        className={styles.deleteItemBtn}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))
+                    ));
+                  })()
                 )}
               </div>
             </>

@@ -78,59 +78,50 @@ export default function RecipesPage() {
     }
   };
 
-  const addToShoppingList = async (recipe: Recipe) => {
-    try {
-      const response = await fetch('/api/shopping-lists');
-      const data = await response.json();
-      let listId = null;
+const addToShoppingList = async (recipe: Recipe) => {
+  try {
+    const response = await fetch('/api/shopping-lists');
+    const data = await response.json();
 
-      if (data.lists && data.lists.length > 0) {
-        listId = data.lists[0].id;
-        const currentItems = data.lists[0].items;
-        const newItems = recipe.ingredients.map((ing) => ({
-          id: Date.now().toString() + Math.random(),
-          name: ing.name,
-          amount: ing.amount,
-          unit: ing.unit,
-          checked: false,
-          recipeSource: recipe.name,
-        }));
+    // Crear items con el nombre de la receta como categoría
+    const newItems = recipe.ingredients.map((ing) => ({
+      id: Date.now().toString() + Math.random(),
+      name: ing.name,
+      amount: ing.amount,
+      unit: ing.unit,
+      checked: false,
+      recipeSource: recipe.name, // Identificador de receta
+    }));
 
-        await fetch('/api/shopping-lists', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: listId,
-            name: data.lists[0].name,
-            items: [...currentItems, ...newItems],
-          }),
-        });
-      } else {
-        const newItems = recipe.ingredients.map((ing) => ({
-          id: Date.now().toString() + Math.random(),
-          name: ing.name,
-          amount: ing.amount,
-          unit: ing.unit,
-          checked: false,
-          recipeSource: recipe.name,
-        }));
-
-        await fetch('/api/shopping-lists', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'Mi Lista',
-            items: newItems,
-          }),
-        });
-      }
-
-      toast.success('Ingredientes agregados a la lista de compras');
-    } catch (error) {
-      console.error('Error agregando a lista de compras:', error);
-      toast.error('Error al agregar a la lista de compras');
+    if (data.lists && data.lists.length > 0) {
+      // Agregar a lista existente
+      await fetch('/api/shopping-lists', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: data.lists[0].id,
+          name: data.lists[0].name,
+          items: [...data.lists[0].items, ...newItems],
+        }),
+      });
+    } else {
+      // Crear nueva lista
+      await fetch('/api/shopping-lists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Mi Lista de Compras',
+          items: newItems,
+        }),
+      });
     }
-  };
+
+    toast.success(`Ingredientes de "${recipe.name}" agregados`);
+  } catch (error) {
+    console.error('Error:', error);
+    toast.error('Error al agregar a la lista');
+  }
+};
 
   const openCalendarModal = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
