@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Recipe } from '@/lib/types';
 import styles from './calendar.module.css';
+import Image from 'next/image';
+import { toast } from 'sonner';
 
 interface CalendarEvent {
   id: string;
@@ -28,20 +30,40 @@ export default function CalendarPage() {
       setEvents(data.events || []);
     } catch (error) {
       console.error('Error cargando eventos:', error);
+      toast.error('Error al cargar los eventos del calendario');
     }
     setLoading(false);
   };
 
-  const removeEvent = async (id: string) => {
-    if (!confirm('¿Eliminar este evento?')) return;
+  // --- FUNCIÓN 'removeEvent' MODIFICADA ---
+  const removeEvent = (id: string) => {
+    // Ya no usa 'confirm()'
+    // if (!confirm('¿Eliminar este evento?')) return;
 
-    try {
-      await fetch(`/api/calendar?id=${id}`, { method: 'DELETE' });
-      setEvents(events.filter((e) => e.id !== id));
-    } catch (error) {
-      console.error('Error eliminando evento:', error);
-    }
+    // Llama a un toast de advertencia con acciones
+    toast.warning('¿Estás seguro de que quieres eliminar este evento?', {
+      action: {
+        label: 'Eliminar',
+        onClick: async () => {
+          // La lógica de borrado ahora vive dentro del onClick del toast
+          try {
+            await fetch(`/api/calendar?id=${id}`, { method: 'DELETE' });
+            // Usamos la forma funcional de 'setEvents' para asegurar el estado más reciente
+            setEvents((prevEvents) => prevEvents.filter((e) => e.id !== id));
+            toast.success('Evento eliminado del calendario');
+          } catch (error) {
+            console.error('Error eliminando evento:', error);
+            toast.error('Error al eliminar el evento');
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancelar',
+        onClick: () => toast.dismiss(), // Cierra el toast actual
+      },
+    });
   };
+  // --- FIN DE LA MODIFICACIÓN ---
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -89,7 +111,8 @@ export default function CalendarPage() {
     'Diciembre',
   ];
 
-  const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  // Nombres de días acortados para móviles
+  const dayNames = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 
   if (loading) {
     return <div className={styles.loading}>Cargando...</div>;
@@ -149,8 +172,8 @@ export default function CalendarPage() {
                       <span>{event.recipe_data.name}</span>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation();
-                          removeEvent(event.id);
+                          e.stopPropagation(); // Evita que se abra el modal
+                          removeEvent(event.id); // Llama a la nueva función de toast
                         }}
                         className={styles.eventDelete}
                       >
@@ -180,6 +203,18 @@ export default function CalendarPage() {
             >
               ×
             </button>
+
+            {selectedRecipe.imageUrl && (
+              <div className={styles.modalImageContainer}>
+                <Image
+                  src={selectedRecipe.imageUrl}
+                  alt={selectedRecipe.name}
+                  width={600}
+                  height={400}
+                  className={styles.modalImage}
+                />
+              </div>
+            )}
 
             <h2>{selectedRecipe.name}</h2>
             <p className={styles.description}>{selectedRecipe.description}</p>

@@ -28,7 +28,7 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        <h2>RecipeHub</h2>
+        <h2>Mr. Cook</h2>
       </div>
       
       <nav className={styles.nav}>

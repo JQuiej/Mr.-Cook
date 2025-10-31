@@ -1,4 +1,6 @@
 :root {
+/* Paleta Anterior (Verde) */
+  /*
   --background: #FFFFFF;
   --foreground: #1A1A1A;
   --primary: #2C5F2D;
@@ -12,6 +14,22 @@
   --sidebar-hover: #EEEEEE;
   --input-bg: #FFFFFF;
   --shadow: rgba(0, 0, 0, 0.1);
+  */
+
+  /* Nueva Paleta "Cálida y Apetecible" 🍲 */
+  --background: #FFFBF5; /* Un blanco cálido, como crema */
+  --foreground: #333333; /* Un gris oscuro, más suave que el negro */
+  --primary: #E67E22;    /* Naranja "Butternut" o terracota */
+  --primary-hover: #D35400; /* Naranja más oscuro para hover */
+  --secondary: #FFF3E0;  /* Un color melocotón/naranja muy pálido */
+  --accent: #E74C3C;     /* Un rojo coral para acentos (ej. borrar) */
+  --border: #F0F0F0;     /* Un borde muy claro */
+  --card: #FFFFFF;       /* Tarjetas blancas y limpias */
+  --error: #D32F2F;     /* El rojo de error está bien */
+  --sidebar-bg: #FDFEFE; /* Un fondo casi blanco pero separado */
+  --sidebar-hover: #FFF3E0; /* Usar el secundario para hover */
+  --input-bg: #FFFFFF;   /* Fondo de input blanco */
+  --shadow: rgba(44, 44, 44, 0.08); /* Sombra más suave */
 }
 
 * {
@@ -43,4 +61,16 @@ input,
 textarea,
 select {
   font-family: inherit;
+}
+
+/* ... [Estilos existentes] ... */
+
+/* Anulación global para el contenido principal en móviles */
+/* Idealmente, esto iría en layout.module.css */
+@media (max-width: 768px) {
+  main {
+    /* Asumiendo que 'main' es el tag usado en layout.tsx */
+    margin-left: 0 !important;
+    padding: 1rem; /* Añadir padding para móviles */
+  }
 }

@@ -1,41 +1,66 @@
 import { Recipe } from '@/lib/types';
 import styles from './page.module.css';
+// import { use } from 'react'; // <-- Ya no es necesario
+import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
 
-async function getSharedRecipe(code: string) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/shared-recipes?code=${code}`,
-      { cache: 'no-store' }
-    );
-    
-    if (!response.ok) return null;
-    
-    const data = await response.json();
-    return data.recipe;
-  } catch (error) {
-    console.error('Error:', error);
-    return null;
-  }
-}
+// Ya no necesitamos la función getSharedRecipe()
 
 export default async function SharedRecipePage({
   params,
 }: {
-  params: { code: string };
+  // 1. Acepta 'params' como una Promesa, que es lo que Next.js te está enviando
+  params: Promise<{ code: string }>;
 }) {
-  const sharedRecipe = await getSharedRecipe(params.code);
+  // 2. Resuelve la promesa con 'await'
+  const resolvedParams = await params;
+  const shareCode = resolvedParams.code;
 
-  if (!sharedRecipe) {
+  let sharedRecipe;
+
+  // 3. Mover la lógica de la API directamente aquí
+  try {
+    const supabase = await createClient();
+
+    if (!shareCode) {
+      return notFound(); // Redirige a la página 404 si el código está vacío
+    }
+
+    // 4. Obtener los datos de la receta
+    const { data, error } = await supabase
+      .from('shared_recipes')
+      .select('*')
+      .eq('share_code', shareCode)
+      .single();
+
+    // 5. Si hay un error o no hay datos, mostrar la página 404
+    if (error || !data) {
+      return notFound();
+    }
+
+    // 6. Incrementar las vistas (esto se hace "sin esperar")
+    supabase
+      .from('shared_recipes')
+      .update({ views: data.views + 1 })
+      .eq('id', data.id)
+      .then(); // .then() vacío "dispara y olvida" la promesa
+
+    sharedRecipe = data; // Asignar los datos a nuestra variable
+
+  } catch (error) {
+    console.error('Error obteniendo receta compartida:', error);
+    // Un error genérico si la base de datos falla
     return (
       <div className={styles.container}>
         <div className={styles.error}>
-          <h1>Receta no encontrada</h1>
-          <p>El enlace que seguiste no es válido o la receta ya no existe.</p>
+          <h1>Error del servidor</h1>
+          <p>No se pudo cargar la receta. Inténtalo de nuevo más tarde.</p>
         </div>
       </div>
     );
   }
-
+  
+  // 7. Renderizar la receta
   const recipe: Recipe = sharedRecipe.recipe_data;
 
   return (
@@ -96,7 +121,7 @@ export default async function SharedRecipePage({
       <div className={styles.footer}>
         <p>Vistas: {sharedRecipe.views}</p>
         <a href="/" className={styles.link}>
-          Crear mi cuenta en RecipeHub →
+          Crear mi cuenta en Mr. Cook →
         </a>
       </div>
     </div>

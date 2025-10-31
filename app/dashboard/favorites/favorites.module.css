@@ -56,12 +56,35 @@
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s;
+  display: flex; /* <-- Añadido para mejor estructura */
+  flex-direction: column; /* <-- Añadido */
 }
 
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px var(--shadow);
 }
+
+/* --- ESTILOS DE IMAGEN AÑADIDOS --- */
+.recipeImageContainer {
+  width: 100%;
+  border-radius: 8px; /* Redondeado más suave */
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: var(--secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 180px; /* Altura mínima */
+}
+
+.recipeImage {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 250px;
+}
+/* --- FIN DE ESTILOS DE IMAGEN --- */
 
 .card h2 {
   font-size: 1.25rem;
@@ -79,6 +102,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex-grow: 1; /* <-- Añadido para empujar acciones al fondo */
 }
 
 .meta {
@@ -103,6 +127,7 @@
 .actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap; /* <-- Añadido para responsividad */
 }
 
 .viewBtn {
@@ -122,7 +147,8 @@
 }
 
 .calendarBtn,
-.deleteBtn {
+.deleteBtn,
+.shareBtn { /* <-- .shareBtn añadido */
   padding: 0.625rem 1rem;
   background: white;
   border: 1px solid var(--border);
@@ -131,7 +157,8 @@
   transition: all 0.2s;
 }
 
-.calendarBtn:hover {
+.calendarBtn:hover,
+.shareBtn:hover { /* <-- .shareBtn añadido */
   background: var(--secondary);
 }
 
@@ -182,6 +209,28 @@
   color: var(--foreground);
 }
 
+/* --- ESTILOS DE IMAGEN DE MODAL AÑADIDOS --- */
+.modalImageContainer {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalImage {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 400px;
+}
+/* --- FIN DE ESTILOS DE IMAGEN DE MODAL --- */
+
+
 .modalContent h2 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -193,6 +242,7 @@
 .modalContent .description {
   display: block;
   -webkit-line-clamp: unset;
+  flex-grow: 0; /* <-- Anular el flex-grow en el modal */
 }
 
 .ingredients,
@@ -233,6 +283,73 @@
   font-size: 0.9rem;
   flex-wrap: wrap;
 }
+
+/* --- ESTILOS DE MODAL DE CALENDARIO AÑADIDOS --- */
+.dateInput {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.confirmBtn,
+.cancelBtn {
+  flex: 1;
+  padding: 0.875rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.confirmBtn {
+  background: var(--primary);
+  color: white;
+}
+
+.confirmBtn:hover {
+  background: var(--primary-hover);
+}
+
+.cancelBtn {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.cancelBtn:hover {
+  background: var(--sidebar-hover);
+}
+
+/* ... [Añade esto junto a tus otros estilos de botones como .calendarBtn] ... */
+
+.shoppingBtn {
+  padding: 0.625rem 1rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1.125rem;
+  transition: all 0.2s;
+}
+
+.shoppingBtn:hover {
+  background: var(--secondary);
+}
+
+/* ... [Asegúrate de que .actions esté actualizado para incluir el nuevo botón] ... */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap; /* Importante para que quepan todos los botones */
+}
+/* --- FIN DE ESTILOS DE MODAL DE CALENDARIO --- */
 
 @media (max-width: 768px) {
   .grid {

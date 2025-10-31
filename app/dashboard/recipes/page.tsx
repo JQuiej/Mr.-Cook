@@ -7,12 +7,15 @@ import ShareRecipe from '@/components/ShareRecipe';
 import ServingsAdjuster from '@/components/Servingsadjuster';
 import RecipeNotes from '@/components/Recipenotes';
 import styles from './recipes.module.css';
+import { toast } from 'sonner';
 
 export default function RecipesPage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredientInput, setIngredientInput] = useState('');
   const [category, setCategory] = useState('');
   const [cuisine, setCuisine] = useState('');
+  const [diet, setDiet] = useState('');
+  const [difficulty, setDifficulty] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -39,28 +42,21 @@ export default function RecipesPage() {
       const response = await fetch('/api/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredients, category, cuisine }),
+        body: JSON.stringify({
+          ingredients,
+          category,
+          cuisine,
+          diet,
+          difficulty,
+        }),
       });
       const data = await response.json();
       const fetchedRecipes = data.recipes || [];
       setRecipes(fetchedRecipes);
       setAdjustedRecipes({});
-
-      // Guardar en historial
-      if (fetchedRecipes.length > 0) {
-        await fetch('/api/search-history', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ingredients,
-            category,
-            cuisine,
-            recipes: fetchedRecipes,
-          }),
-        });
-      }
     } catch (error) {
       console.error('Error buscando recetas:', error);
+      toast.error('Error al buscar recetas');
     }
     setLoading(false);
   };
@@ -75,21 +71,20 @@ export default function RecipesPage() {
           recipeData: recipe,
         }),
       });
-      alert('Receta agregada a favoritas');
+      toast.success('Receta agregada a favoritas');
     } catch (error) {
       console.error('Error agregando a favoritas:', error);
+      toast.error('Error al agregar a favoritas');
     }
   };
 
   const addToShoppingList = async (recipe: Recipe) => {
     try {
-      // Obtener listas existentes
       const response = await fetch('/api/shopping-lists');
       const data = await response.json();
       let listId = null;
 
       if (data.lists && data.lists.length > 0) {
-        // Agregar a la primera lista
         listId = data.lists[0].id;
         const currentItems = data.lists[0].items;
         const newItems = recipe.ingredients.map((ing) => ({
@@ -111,7 +106,6 @@ export default function RecipesPage() {
           }),
         });
       } else {
-        // Crear nueva lista
         const newItems = recipe.ingredients.map((ing) => ({
           id: Date.now().toString() + Math.random(),
           name: ing.name,
@@ -131,14 +125,18 @@ export default function RecipesPage() {
         });
       }
 
-      alert('Ingredientes agregados a la lista de compras');
+      toast.success('Ingredientes agregados a la lista de compras');
     } catch (error) {
       console.error('Error agregando a lista de compras:', error);
+      toast.error('Error al agregar a la lista de compras');
     }
   };
 
   const openCalendarModal = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setSelectedDate(tomorrow.toISOString().split('T')[0]);
     setShowCalendarModal(true);
   };
 
@@ -154,11 +152,13 @@ export default function RecipesPage() {
           date: selectedDate,
         }),
       });
-      alert('Receta agregada al calendario');
+      toast.success('Receta agregada al calendario');
       setShowCalendarModal(false);
       setSelectedDate('');
+      setSelectedRecipe(null);
     } catch (error) {
       console.error('Error agregando al calendario:', error);
+      toast.error('Error al agregar al calendario');
     }
   };
 
@@ -172,8 +172,24 @@ export default function RecipesPage() {
 
   return (
     <>
+      {/* PANTALLA DE CARGA */}
+      {loading && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.loadingContent}>
+            <div className={styles.spinner}></div>
+            <h2>🍳 Generando tus recetas...</h2>
+            <p>Esto puede tomar unos segundos</p>
+            <div className={styles.loadingSteps}>
+              <div className={styles.step}>✓ Analizando ingredientes</div>
+              <div className={styles.step}>✓ Buscando recetas perfectas</div>
+              <div className={styles.step}>⏳ Generando imágenes...</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={styles.container}>
-        <h1>Buscar Recetas</h1>
+        <h1>🔍 Buscar Recetas</h1>
 
         <div className={styles.filters}>
           <div className={styles.ingredientsSection}>
@@ -224,6 +240,26 @@ export default function RecipesPage() {
                 <option value="americana">Americana</option>
               </select>
             </div>
+
+            <div className={styles.selectWrapper}>
+              <label>Dieta</label>
+              <select value={diet} onChange={(e) => setDiet(e.target.value)}>
+                <option value="">Cualquiera</option>
+                <option value="vegana">Vegana</option>
+                <option value="vegetariana">Vegetariana</option>
+                <option value="sin gluten">Sin Gluten</option>
+              </select>
+            </div>
+
+            <div className={styles.selectWrapper}>
+              <label>Dificultad</label>
+              <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                <option value="">Cualquiera</option>
+                <option value="fácil">Fácil</option>
+                <option value="media">Media</option>
+                <option value="difícil">Difícil</option>
+              </select>
+            </div>
           </div>
 
           <button onClick={searchRecipes} disabled={loading} className={styles.searchBtn}>
@@ -236,6 +272,16 @@ export default function RecipesPage() {
             const displayRecipe = getDisplayRecipe(i, recipe);
             return (
               <div key={i} className={styles.recipeCard}>
+                {displayRecipe.imageUrl && (
+                  <div className={styles.imageContainer}>
+                    <img
+                      src={displayRecipe.imageUrl}
+                      alt={displayRecipe.name}
+                      className={styles.recipeImage}
+                    />
+                  </div>
+                )}
+
                 <h2>{displayRecipe.name}</h2>
                 <p className={styles.description}>{displayRecipe.description}</p>
 
@@ -243,6 +289,9 @@ export default function RecipesPage() {
                   <span className={styles.badge}>{displayRecipe.category}</span>
                   <span className={styles.badge}>{displayRecipe.cuisine}</span>
                   <span>⏱️ {displayRecipe.prepTime + displayRecipe.cookTime} min</span>
+                  {displayRecipe.difficulty && (
+                    <span className={styles.badge}>{displayRecipe.difficulty}</span>
+                  )}
                 </div>
 
                 <ServingsAdjuster
@@ -271,41 +320,24 @@ export default function RecipesPage() {
                 </div>
 
                 <div className={styles.actions}>
-                  <button
-                    onClick={() => setCookingModeRecipe(displayRecipe)}
-                    className={styles.cookBtn}
-                  >
+                  <button onClick={() => setCookingModeRecipe(displayRecipe)} className={styles.cookBtn}>
                     👨‍🍳 Modo Cocina
                   </button>
-                  <button
-                    onClick={() => addToFavorites(displayRecipe)}
-                    className={styles.favoriteBtn}
-                  >
+                  <button onClick={() => addToFavorites(displayRecipe)} className={styles.favoriteBtn}>
                     ⭐ Favorita
                   </button>
-                  <button
-                    onClick={() => openCalendarModal(displayRecipe)}
-                    className={styles.calendarBtn}
-                  >
+                  <button onClick={() => openCalendarModal(displayRecipe)} className={styles.calendarBtn}>
                     📅 Calendario
                   </button>
-                  <button
-                    onClick={() => addToShoppingList(displayRecipe)}
-                    className={styles.shoppingBtn}
-                  >
+                  <button onClick={() => addToShoppingList(displayRecipe)} className={styles.shoppingBtn}>
                     🛒 Lista
                   </button>
-                  <button
-                    onClick={() => setShareRecipe(displayRecipe)}
-                    className={styles.shareBtn}
-                  >
+                  <button onClick={() => setShareRecipe(displayRecipe)} className={styles.shareBtn}>
                     📤 Compartir
                   </button>
                 </div>
 
-                <RecipeNotes
-                  recipeId={`${recipe.name}-${i}`}
-                />
+                <RecipeNotes recipeId={`${recipe.name}-${i}`} />
               </div>
             );
           })}
@@ -320,6 +352,7 @@ export default function RecipesPage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
                 className={styles.dateInput}
               />
               <div className={styles.modalActions}>
@@ -330,6 +363,7 @@ export default function RecipesPage() {
                   onClick={() => {
                     setShowCalendarModal(false);
                     setSelectedDate('');
+                    setSelectedRecipe(null);
                   }}
                   className={styles.cancelBtn}
                 >
@@ -342,15 +376,10 @@ export default function RecipesPage() {
       </div>
 
       {cookingModeRecipe && (
-        <CookingMode
-          recipe={cookingModeRecipe}
-          onClose={() => setCookingModeRecipe(null)}
-        />
+        <CookingMode recipe={cookingModeRecipe} onClose={() => setCookingModeRecipe(null)} />
       )}
 
-      {shareRecipe && (
-        <ShareRecipe recipe={shareRecipe} onClose={() => setShareRecipe(null)} />
-      )}
+      {shareRecipe && <ShareRecipe recipe={shareRecipe} onClose={() => setShareRecipe(null)} />}
     </>
   );
 }

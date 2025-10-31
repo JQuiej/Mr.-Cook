@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { SearchHistory } from '@/lib/types';
 import { Recipe } from '@/lib/types';
 import styles from './history.module.css';
+import Image from 'next/image'; // <-- 1. Importar Image
+import { toast } from 'sonner'; // <-- Importar toast
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<SearchHistory[]>([]);
@@ -21,19 +23,37 @@ export default function HistoryPage() {
       setHistory(data.history || []);
     } catch (error) {
       console.error('Error cargando historial:', error);
+      toast.error('Error al cargar el historial');
     }
     setLoading(false);
   };
 
-  const deleteHistoryItem = async (id: string) => {
-    if (!confirm('¿Eliminar esta búsqueda del historial?')) return;
+const deleteHistoryItem = (id: string) => {
+    // if (!confirm('¿Eliminar esta búsqueda del historial?')) return; // <-- Eliminado
 
-    try {
-      await fetch(`/api/search-history?id=${id}`, { method: 'DELETE' });
-      setHistory(history.filter((h) => h.id !== id));
-    } catch (error) {
-      console.error('Error eliminando del historial:', error);
-    }
+    toast.warning('¿Eliminar esta búsqueda del historial?', {
+      action: {
+        label: 'Eliminar',
+        onClick: async () => {
+          // Lógica de borrado dentro del onClick del toast
+          try {
+            await fetch(`/api/search-history?id=${id}`, { method: 'DELETE' });
+            // Usar set-state funcional para asegurar el estado más reciente
+            setHistory((prevHistory) =>
+              prevHistory.filter((h) => h.id !== id)
+            );
+            toast.success('Búsqueda eliminada del historial');
+          } catch (error) {
+            console.error('Error eliminando del historial:', error);
+            toast.error('Error al eliminar del historial');
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancelar',
+        onClick: () => toast.dismiss(), // Cierra el toast
+      },
+    });
   };
 
   const addToFavorites = async (recipe: Recipe) => {
@@ -46,9 +66,10 @@ export default function HistoryPage() {
           recipeData: recipe,
         }),
       });
-      alert('Receta agregada a favoritas');
+      toast.success('Receta agregada a favoritas');
     } catch (error) {
       console.error('Error agregando a favoritas:', error);
+      toast.error('Error al agregar a favoritas');
     }
   };
 
@@ -112,6 +133,20 @@ export default function HistoryPage() {
               <div className={styles.recipesGrid}>
                 {item.recipes_data.map((recipe, idx) => (
                   <div key={idx} className={styles.recipeCard}>
+                    {/* --- 2. AÑADIR BLOQUE DE IMAGEN --- */}
+                    {recipe.imageUrl && (
+                      <div className={styles.recipeImageContainer}>
+                        <Image
+                          src={recipe.imageUrl}
+                          alt={recipe.name}
+                          width={400}
+                          height={250}
+                          className={styles.recipeImage}
+                        />
+                      </div>
+                    )}
+                    {/* --- FIN DE BLOQUE DE IMAGEN --- */}
+
                     <h4>{recipe.name}</h4>
                     <p className={styles.description}>{recipe.description}</p>
                     <div className={styles.meta}>
@@ -158,6 +193,20 @@ export default function HistoryPage() {
             >
               ×
             </button>
+
+            {/* --- 3. AÑADIR IMAGEN AL MODAL --- */}
+            {selectedRecipe.imageUrl && (
+              <div className={styles.modalImageContainer}>
+                <Image
+                  src={selectedRecipe.imageUrl}
+                  alt={selectedRecipe.name}
+                  width={600}
+                  height={400}
+                  className={styles.modalImage}
+                />
+              </div>
+            )}
+            {/* --- FIN DE IMAGEN AL MODAL --- */}
 
             <h2>{selectedRecipe.name}</h2>
             <p className={styles.description}>{selectedRecipe.description}</p>

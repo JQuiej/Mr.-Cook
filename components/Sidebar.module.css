@@ -87,3 +87,62 @@
   color: white;
   border-color: var(--error);
 }
+
+/* ... [Estilos existentes] ... */
+
+/* Añadir al final del archivo */
+@media (max-width: 768px) {
+  .sidebar {
+    /* Convertir de barra lateral a barra superior */
+    width: 100%;
+    height: auto;
+    position: relative; /* Dejar de ser 'fixed' */
+    flex-direction: row; /* Hacer horizontal */
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 1rem 1.5rem;
+    border-bottom: none;
+  }
+
+  .logo h2 {
+    font-size: 1.25rem; /* Más pequeño para la barra superior */
+  }
+
+  .nav {
+    flex: 1;
+    padding: 0;
+    flex-direction: row; /* Navegación horizontal */
+    gap: 0;
+    overflow-x: auto; /* Permitir scroll horizontal de ítems */
+    white-space: nowrap;
+  }
+
+  .navItem {
+    padding: 1rem 1.25rem;
+    border-right: none;
+  }
+
+  /* Opcional: Ocultar texto y mostrar solo iconos */
+  .navItem .icon {
+    font-size: 1.25rem;
+    margin-right: 0;
+  }
+  .navItem span:not(.icon) {
+    display: none; /* Ocultar etiquetas de texto */
+  }
+
+  .footer {
+    padding: 0 1rem;
+    border-top: none;
+  }
+
+  .logoutBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}

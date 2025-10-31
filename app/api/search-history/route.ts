@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { saveSearchToHistory } from '@/lib/historyUtils'; // <-- 1. Importar
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,19 +47,15 @@ export async function POST(request: NextRequest) {
 
     const { ingredients, category, cuisine, recipes } = await request.json();
 
-    const { data, error } = await supabase
-      .from('search_history')
-      .insert({
-        user_id: user.id,
-        ingredients: ingredients || [],
-        category: category || null,
-        cuisine: cuisine || null,
-        recipes_data: recipes,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
+    // --- 2. SECCIÓN CORREGIDA ---
+    // Usar la función compartida
+    const data = await saveSearchToHistory(supabase, user.id, {
+      ingredients,
+      category,
+      cuisine,
+      recipes,
+    });
+    // --- FIN DE LA CORRECCIÓN ---
 
     return NextResponse.json({ history: data });
   } catch (error) {

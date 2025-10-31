@@ -2,6 +2,7 @@ export interface Recipe {
   id?: string;
   name: string;
   description?: string;
+  imageKeywords?: string; // <-- AÑADIR ESTE CAMPO
   ingredients: Ingredient[];
   instructions: string[];
   prepTime: number;
@@ -10,6 +11,7 @@ export interface Recipe {
   cuisine: string;
   servings: number;
   imageUrl?: string;
+  difficulty?: 'fácil' | 'media' | 'difícil';
   userId?: string;
   createdAt?: string;
 }
@@ -50,6 +52,8 @@ export interface SearchHistory {
   category: string | null;
   cuisine: string | null;
   recipes_data: Recipe[];
+  diet: string | null;
+  difficulty: string | null;
   created_at: string;
 }
 

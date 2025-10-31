@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Recipe } from '@/lib/types';
 import styles from './favorites.module.css';
+import { toast } from 'sonner';
+import ShareRecipe from '@/components/ShareRecipe';
+import Image from 'next/image'; // <-- 1. Importar Image
 
 interface Favorite {
   id: string;
@@ -15,6 +18,13 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [shareRecipe, setShareRecipe] = useState<Recipe | null>(null);
+
+  // --- NUEVOS ESTADOS PARA EL MODAL DE CALENDARIO ---
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [recipeForCalendar, setRecipeForCalendar] = useState<Recipe | null>(null);
+  // --- FIN DE NUEVOS ESTADOS ---
 
   useEffect(() => {
     loadFavorites();
@@ -27,36 +37,129 @@ export default function FavoritesPage() {
       setFavorites(data.favorites || []);
     } catch (error) {
       console.error('Error cargando favoritas:', error);
+      toast.error('Error al cargar las favoritas');
     }
     setLoading(false);
   };
 
-  const removeFavorite = async (id: string) => {
-    if (!confirm('¿Eliminar esta receta de favoritas?')) return;
+  const removeFavorite = (id: string) => {
+    // if (!confirm('¿Eliminar esta receta de favoritas?')) return; // <-- Eliminado
 
-    try {
-      await fetch(`/api/favorites?id=${id}`, { method: 'DELETE' });
-      setFavorites(favorites.filter((f) => f.id !== id));
-    } catch (error) {
-      console.error('Error eliminando favorita:', error);
-    }
+    toast.warning('¿Eliminar esta receta de favoritas?', {
+      action: {
+        label: 'Eliminar',
+        onClick: async () => {
+          // Lógica de borrado dentro del onClick del toast
+          try {
+            await fetch(`/api/favorites?id=${id}`, { method: 'DELETE' });
+            // Usar set-state funcional para asegurar el estado más reciente
+            setFavorites((prevFavorites) =>
+              prevFavorites.filter((f) => f.id !== id)
+            );
+            toast.success('Receta eliminada de favoritas');
+          } catch (error) {
+            console.error('Error eliminando favorita:', error);
+            toast.error('Error al eliminar la favorita');
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancelar',
+        onClick: () => toast.dismiss(), // Cierra el toast
+      },
+    });
   };
-
-  const addToCalendar = async (recipe: Recipe) => {
-    const date = prompt('Fecha (YYYY-MM-DD):');
-    if (!date) return;
+  const addToCalendar = async () => {
+    // const date = prompt('Fecha (YYYY-MM-DD):'); (Línea eliminada)
+    if (!selectedDate || !recipeForCalendar) return; // Validar con estado
 
     try {
       await fetch('/api/calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipeData: recipe, date }),
+        body: JSON.stringify({
+          recipeData: recipeForCalendar, // Usar estado
+          date: selectedDate, // Usar estado
+        }),
       });
-      alert('Agregada al calendario');
+      toast.success('Agregada al calendario');
+      // Limpiar y cerrar modal
+      setShowCalendarModal(false);
+      setSelectedDate('');
+      setRecipeForCalendar(null);
     } catch (error) {
       console.error('Error agregando al calendario:', error);
+      toast.error('Error al agregar al calendario');
     }
   };
+
+  const openCalendarModal = (recipe: Recipe) => {
+    setRecipeForCalendar(recipe);
+    // Poner la fecha de mañana por defecto
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setSelectedDate(tomorrow.toISOString().split('T')[0]);
+    setShowCalendarModal(true);
+  };
+
+  // --- FUNCIÓN AÑADIDA: addToShoppingList ---
+  const addToShoppingList = async (recipe: Recipe) => {
+    try {
+      // Obtener listas existentes
+      const response = await fetch('/api/shopping-lists');
+      const data = await response.json();
+      let listId = null;
+
+      if (data.lists && data.lists.length > 0) {
+        // Agregar a la primera lista
+        listId = data.lists[0].id;
+        const currentItems = data.lists[0].items;
+        const newItems = recipe.ingredients.map((ing) => ({
+          id: Date.now().toString() + Math.random(),
+          name: ing.name,
+          amount: ing.amount,
+          unit: ing.unit,
+          checked: false,
+          recipeSource: recipe.name,
+        }));
+
+        await fetch('/api/shopping-lists', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: listId,
+            name: data.lists[0].name,
+            items: [...currentItems, ...newItems],
+          }),
+        });
+      } else {
+        // Crear nueva lista
+        const newItems = recipe.ingredients.map((ing) => ({
+          id: Date.now().toString() + Math.random(),
+          name: ing.name,
+          amount: ing.amount,
+          unit: ing.unit,
+          checked: false,
+          recipeSource: recipe.name,
+        }));
+
+        await fetch('/api/shopping-lists', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'Mi Lista',
+            items: newItems,
+          }),
+        });
+      }
+
+      toast.success('Ingredientes agregados a la lista de compras');
+    } catch (error) {
+      console.error('Error agregando a lista de compras:', error);
+      toast.error('Error al agregar a la lista de compras');
+    }
+  };
+  // --- FIN DE LA FUNCIÓN AÑADIDA ---
 
   if (loading) {
     return <div className={styles.loading}>Cargando...</div>;
@@ -75,6 +178,20 @@ export default function FavoritesPage() {
         <div className={styles.grid}>
           {favorites.map((favorite) => (
             <div key={favorite.id} className={styles.card}>
+              {/* --- 2. AÑADIR BLOQUE DE IMAGEN --- */}
+              {favorite.recipe_data.imageUrl && (
+                <div className={styles.recipeImageContainer}>
+                  <Image
+                    src={favorite.recipe_data.imageUrl}
+                    alt={favorite.recipe_data.name}
+                    width={400}
+                    height={250}
+                    className={styles.recipeImage}
+                  />
+                </div>
+              )}
+              {/* --- FIN DE BLOQUE DE IMAGEN --- */}
+
               <h2>{favorite.recipe_data.name}</h2>
               <p className={styles.description}>
                 {favorite.recipe_data.description}
@@ -103,10 +220,26 @@ export default function FavoritesPage() {
                   Ver Detalles
                 </button>
                 <button
-                  onClick={() => addToCalendar(favorite.recipe_data)}
+                  onClick={() => openCalendarModal(favorite.recipe_data)}
                   className={styles.calendarBtn}
                 >
                   📅
+                </button>
+                
+                {/* --- BOTÓN AÑADIDO --- */}
+                <button
+                  onClick={() => addToShoppingList(favorite.recipe_data)}
+                  className={styles.shoppingBtn}
+                >
+                  🛒
+                </button>
+                {/* --- FIN DE BOTÓN AÑADIDO --- */}
+
+                <button
+                  onClick={() => setShareRecipe(favorite.recipe_data)}
+                  className={styles.shareBtn}
+                >
+                  📤 Compartir
                 </button>
                 <button
                   onClick={() => removeFavorite(favorite.id)}
@@ -135,6 +268,20 @@ export default function FavoritesPage() {
             >
               ×
             </button>
+
+            {/* --- 3. AÑADIR IMAGEN AL MODAL --- */}
+            {selectedRecipe.imageUrl && (
+              <div className={styles.modalImageContainer}>
+                <Image
+                  src={selectedRecipe.imageUrl}
+                  alt={selectedRecipe.name}
+                  width={600}
+                  height={400}
+                  className={styles.modalImage}
+                />
+              </div>
+            )}
+            {/* --- FIN DE IMAGEN AL MODAL --- */}
 
             <h2>{selectedRecipe.name}</h2>
             <p className={styles.description}>{selectedRecipe.description}</p>
@@ -166,6 +313,51 @@ export default function FavoritesPage() {
             </div>
           </div>
         </div>
+      )}
+      {showCalendarModal && (
+        <div
+          className={styles.modal}
+          onClick={() => setShowCalendarModal(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowCalendarModal(false)}
+              className={styles.closeBtn}
+            >
+              ×
+            </button>
+            <h2>Agregar al Calendario</h2>
+            <p>Selecciona la fecha para: {recipeForCalendar?.name}</p>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]} // Evitar fechas pasadas
+              className={styles.dateInput} // Necesita estilos (ver paso sig.)
+            />
+            <div className={styles.modalActions}>
+              <button onClick={addToCalendar} className={styles.confirmBtn}>
+                Confirmar
+              </button>
+              <button
+                onClick={() => setShowCalendarModal(false)}
+                className={styles.cancelBtn}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {shareRecipe && (
+        <ShareRecipe
+          recipe={shareRecipe}
+          onClose={() => setShareRecipe(null)}
+        />
       )}
     </div>
   );

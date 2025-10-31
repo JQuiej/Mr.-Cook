@@ -4,7 +4,7 @@
 }
 
 .header {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem; /* Reducido */
 }
 
 .header h1 {
@@ -19,10 +19,116 @@
   font-size: 1.125rem;
 }
 
-.grid {
+/* --- NUEVOS ESTILOS DE RESUMEN --- */
+.summaryTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.summaryGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.summaryCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.summaryCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+}
+
+.summaryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1; /* Empuja el link al fondo */
+  margin-bottom: 1.5rem;
+}
+
+.summaryItem {
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.summaryItemDate {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.summaryItemName {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.emptySummary {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.shoppingSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+}
+
+.shoppingCount {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.shoppingSummary p {
+  font-size: 1.125rem;
+  color: #666;
+}
+
+/* --- FIN DE NUEVOS ESTILOS DE RESUMEN --- */
+
+/* --- ESTILOS DE GRID MODIFICADOS --- */
+.grid {
+  display: grid;
+  /* Modificado a 2x2 en lugar de auto-fit */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr; /* 1 columna en móvil */
+  }
 }
 
 .card {
@@ -31,11 +137,28 @@
   border-radius: 12px;
   padding: 2rem;
   transition: all 0.3s ease;
+  display: flex; /* Añadido */
+  flex-direction: column; /* Añadido */
 }
 
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px var(--shadow);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.summaryCount {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
 .card h3 {
@@ -49,6 +172,7 @@
   color: #666;
   margin-bottom: 1.5rem;
   line-height: 1.6;
+  flex-grow: 1; /* Empuja el link al fondo */
 }
 
 .cardLink {
@@ -58,6 +182,7 @@
   color: var(--primary);
   font-weight: 600;
   transition: all 0.2s ease;
+  margin-top: auto; /* Se alinea al fondo */
 }
 
 .cardLink:hover {
