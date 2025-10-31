@@ -44,6 +44,7 @@ export default async function DashboardPage() {
       .eq('user_id', user.id)
       .gte('date', today)
       .lte('date', nextWeek)
+      .not('recipe_data', 'is', null) // <-- AÑADE ESTO
       .order('date', { ascending: true })
       .limit(5),
     
@@ -87,16 +88,18 @@ export default async function DashboardPage() {
           <h3>Próximas Recetas</h3>
           {upcomingRecipes.length > 0 ? (
             <ul className={styles.summaryList}>
-              {upcomingRecipes.map((event) => (
-                <li key={event.id} className={styles.summaryItem}>
-                  <span className={styles.summaryItemDate}>
-                    {formatDate(event.date)}
-                  </span>
-                  <span className={styles.summaryItemName}>
-                    {event.recipeData.name}
-                  </span>
-                </li>
-              ))}
+              {upcomingRecipes
+                .filter(event => event.recipeData?.name)
+                .map((event) => (
+                  <li key={event.id} className={styles.summaryItem}>
+                    <span className={styles.summaryItemDate}>
+                      {formatDate(event.date)}
+                    </span>
+                    <span className={styles.summaryItemName}>
+                      {event.recipeData.name}
+                    </span>
+                  </li>
+                ))}
             </ul>
           ) : (
             <p className={styles.emptySummary}>

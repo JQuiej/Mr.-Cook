@@ -6,6 +6,10 @@ import { Toaster } from 'sonner'; // <-- 1. Importar
 export const metadata: Metadata = {
   title: 'Mr. Cook - Descubre recetas increíbles',
   description: 'Encuentra y guarda tus recetas favoritas',
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
 };
 
 export default function RootLayout({
