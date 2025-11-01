@@ -1,8 +1,8 @@
 import { Recipe } from '@/lib/types';
 import styles from './page.module.css';
-// import { use } from 'react'; // <-- Ya no es necesario
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+import Image from 'next/image'; // <-- 1. IMPORTAR IMAGE
 
 // Ya no necesitamos la función getSharedRecipe()
 
@@ -65,6 +65,21 @@ export default async function SharedRecipePage({
 
   return (
     <div className={styles.container}>
+      {/* --- 2. AÑADIR BLOQUE DE IMAGEN AQUÍ --- */}
+      {recipe.imageUrl && (
+        <div className={styles.imageContainer}>
+          <Image
+            src={recipe.imageUrl}
+            alt={recipe.name}
+            width={800}
+            height={450}
+            className={styles.recipeImage}
+            priority // Cargar esta imagen primero
+          />
+        </div>
+      )}
+      {/* --- FIN DEL BLOQUE DE IMAGEN --- */}
+
       <div className={styles.header}>
         <h1>{recipe.name}</h1>
         <div className={styles.meta}>
@@ -77,6 +92,7 @@ export default async function SharedRecipePage({
       </div>
 
       <div className={styles.content}>
+        {/* ... (el resto del archivo no cambia) ... */}
         <div className={styles.section}>
           <h2>Ingredientes</h2>
           <ul className={styles.ingredientsList}>
