@@ -138,7 +138,7 @@ export default function ShoppingPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Lista de Compras</h1>
+        <h1>      Lista de Compras</h1>
         <button onClick={() => setShowNewListModal(true)} className={styles.newListBtn}>
           + Nueva Lista
         </button>

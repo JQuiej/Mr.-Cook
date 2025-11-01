@@ -90,7 +90,7 @@ const deleteHistoryItem = (id: string) => {
 
   return (
     <div className={styles.container}>
-      <h1>Historial de Búsquedas</h1>
+      <h1>      Historial de Búsquedas</h1>
 
       {history.length === 0 ? (
         <div className={styles.empty}>

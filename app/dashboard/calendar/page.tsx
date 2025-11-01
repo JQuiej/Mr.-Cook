@@ -121,7 +121,7 @@ export default function CalendarPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Calendario de Recetas</h1>
+        <h1>      Calendario de Recetas</h1>
         <div className={styles.monthNav}>
           <button onClick={prevMonth} className={styles.navBtn}>
             ←

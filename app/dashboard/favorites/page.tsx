@@ -156,7 +156,7 @@ const addToShoppingList = async (recipe: Recipe) => {
 
   return (
     <div className={styles.container}>
-      <h1>Mis Recetas Favoritas</h1>
+      <h1>      Mis Recetas Favoritas</h1>
 
       {favorites.length === 0 ? (
         <div className={styles.empty}>

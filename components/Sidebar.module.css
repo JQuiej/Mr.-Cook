@@ -9,6 +9,8 @@
   display: flex;
   flex-direction: column;
   z-index: 100;
+  /* Añadir transición para la versión móvil */
+  transition: transform 0.3s ease-in-out;
 }
 
 .logo {
@@ -88,61 +90,65 @@
   border-color: var(--error);
 }
 
-/* ... [Estilos existentes] ... */
+/* --- ESTILOS DE HAMBURGUESA Y OVERLAY (INICIALMENTE OCULTOS) --- */
+.mobileMenuButton {
+  display: none; /* Oculto en desktop */
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2001; /* Encima de todo */
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px var(--shadow);
+}
 
-/* Añadir al final del archivo */
+.mobileOverlay {
+  display: none; /* Oculto en desktop */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99; /* Debajo del sidebar, encima del main */
+}
+
+/* --- LÓGICA MÓVIL (REEMPLAZA EL CÓDIGO ANTERIOR) --- */
 @media (max-width: 768px) {
   .sidebar {
-    /* Convertir de barra lateral a barra superior */
-    width: 100%;
-    height: auto;
-    position: relative; /* Dejar de ser 'fixed' */
-    flex-direction: row; /* Hacer horizontal */
-    align-items: center;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    z-index: 100;
+    /* 1. Ocultar fuera de la pantalla por defecto */
+    transform: translateX(-100%);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
 
+  .sidebar.mobileOpen {
+    /* 2. Mostrar cuando el estado esté activo */
+    transform: translateX(0);
+  }
+
+  .mobileMenuButton {
+    /* 3. Mostrar el botón de hamburguesa */
+    display: block;
+  }
+
+  .mobileOverlay {
+    /* 4. Mostrar el overlay cuando el menú esté abierto */
+    display: block;
+  }
+
+  /* (Opcional) Hacer que el logo se vea mejor en el menú móvil */
   .logo {
-    padding: 1rem 1.5rem;
-    border-bottom: none;
+    text-align: center;
+    padding-top: 3rem;
   }
 
-  .logo h2 {
-    font-size: 1.25rem; /* Más pequeño para la barra superior */
-  }
-
-  .nav {
-    flex: 1;
-    padding: 0;
-    flex-direction: row; /* Navegación horizontal */
-    gap: 0;
-    overflow-x: auto; /* Permitir scroll horizontal de ítems */
-    white-space: nowrap;
-  }
-
-  .navItem {
-    padding: 1rem 1.25rem;
+  /* (Opcional) Quitar borde activo en móvil */
+  .navItem.active {
     border-right: none;
-  }
-
-  /* Opcional: Ocultar texto y mostrar solo iconos */
-  .navItem .icon {
-    font-size: 1.25rem;
-    margin-right: 0;
-  }
-  .navItem span:not(.icon) {
-    display: none; /* Ocultar etiquetas de texto */
-  }
-
-  .footer {
-    padding: 0 1rem;
-    border-top: none;
-  }
-
-  .logoutBtn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
   }
 }

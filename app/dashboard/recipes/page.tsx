@@ -180,7 +180,7 @@ const addToShoppingList = async (recipe: Recipe) => {
       )}
 
       <div className={styles.container}>
-        <h1>🔍 Buscar Recetas</h1>
+        <h1>      Buscar Recetas</h1>
 
         <div className={styles.filters}>
           <div className={styles.ingredientsSection}>
