@@ -5,7 +5,8 @@ import { Recipe } from '@/lib/types';
 import styles from './favorites.module.css';
 import { toast } from 'sonner';
 import ShareRecipe from '@/components/ShareRecipe';
-import Image from 'next/image'; // <-- 1. Importar Image
+import Image from 'next/image';
+import CookingMode from '@/components/CookingMode'; // <-- 1. IMPORTAR
 
 interface Favorite {
   id: string;
@@ -19,6 +20,7 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [shareRecipe, setShareRecipe] = useState<Recipe | null>(null);
+  const [cookingModeRecipe, setCookingModeRecipe] = useState<Recipe | null>(null); // <-- 2. AÑADIR ESTADO
 
   // --- NUEVOS ESTADOS PARA EL MODAL DE CALENDARIO ---
   const [showCalendarModal, setShowCalendarModal] = useState(false);
@@ -43,16 +45,12 @@ export default function FavoritesPage() {
   };
 
   const removeFavorite = (id: string) => {
-    // if (!confirm('¿Eliminar esta receta de favoritas?')) return; // <-- Eliminado
-
     toast.warning('¿Eliminar esta receta de favoritas?', {
       action: {
         label: 'Eliminar',
         onClick: async () => {
-          // Lógica de borrado dentro del onClick del toast
           try {
             await fetch(`/api/favorites?id=${id}`, { method: 'DELETE' });
-            // Usar set-state funcional para asegurar el estado más reciente
             setFavorites((prevFavorites) =>
               prevFavorites.filter((f) => f.id !== id)
             );
@@ -65,25 +63,23 @@ export default function FavoritesPage() {
       },
       cancel: {
         label: 'Cancelar',
-        onClick: () => toast.dismiss(), // Cierra el toast
+        onClick: () => toast.dismiss(),
       },
     });
   };
   const addToCalendar = async () => {
-    // const date = prompt('Fecha (YYYY-MM-DD):'); (Línea eliminada)
-    if (!selectedDate || !recipeForCalendar) return; // Validar con estado
+    if (!selectedDate || !recipeForCalendar) return;
 
     try {
       await fetch('/api/calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          recipeData: recipeForCalendar, // Usar estado
-          date: selectedDate, // Usar estado
+          recipeData: recipeForCalendar,
+          date: selectedDate,
         }),
       });
       toast.success('Agregada al calendario');
-      // Limpiar y cerrar modal
       setShowCalendarModal(false);
       setSelectedDate('');
       setRecipeForCalendar(null);
@@ -95,31 +91,27 @@ export default function FavoritesPage() {
 
   const openCalendarModal = (recipe: Recipe) => {
     setRecipeForCalendar(recipe);
-    // Poner la fecha de mañana por defecto
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     setSelectedDate(tomorrow.toISOString().split('T')[0]);
     setShowCalendarModal(true);
   };
 
-  // --- FUNCIÓN AÑADIDA: addToShoppingList ---
 const addToShoppingList = async (recipe: Recipe) => {
   try {
     const response = await fetch('/api/shopping-lists');
     const data = await response.json();
 
-    // Crear items con el nombre de la receta como categoría
     const newItems = recipe.ingredients.map((ing) => ({
       id: Date.now().toString() + Math.random(),
       name: ing.name,
       amount: ing.amount,
       unit: ing.unit,
       checked: false,
-      recipeSource: recipe.name, // Identificador de receta
+      recipeSource: recipe.name,
     }));
 
     if (data.lists && data.lists.length > 0) {
-      // Agregar a lista existente
       await fetch('/api/shopping-lists', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -130,7 +122,6 @@ const addToShoppingList = async (recipe: Recipe) => {
         }),
       });
     } else {
-      // Crear nueva lista
       await fetch('/api/shopping-lists', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -148,15 +139,13 @@ const addToShoppingList = async (recipe: Recipe) => {
   }
 };
 
-  // --- FIN DE LA FUNCIÓN AÑADIDA ---
-
   if (loading) {
     return <div className={styles.loading}>Cargando...</div>;
   }
 
   return (
     <div className={styles.container}>
-      <h1>      Mis Recetas Favoritas</h1>
+      <h1>Mis Recetas Favoritas</h1>
 
       {favorites.length === 0 ? (
         <div className={styles.empty}>
@@ -167,7 +156,6 @@ const addToShoppingList = async (recipe: Recipe) => {
         <div className={styles.grid}>
           {favorites.map((favorite) => (
             <div key={favorite.id} className={styles.card}>
-              {/* --- 2. AÑADIR BLOQUE DE IMAGEN --- */}
               {favorite.recipe_data.imageUrl && (
                 <div className={styles.recipeImageContainer}>
                   <Image
@@ -179,7 +167,6 @@ const addToShoppingList = async (recipe: Recipe) => {
                   />
                 </div>
               )}
-              {/* --- FIN DE BLOQUE DE IMAGEN --- */}
 
               <h2>{favorite.recipe_data.name}</h2>
               <p className={styles.description}>
@@ -201,6 +188,7 @@ const addToShoppingList = async (recipe: Recipe) => {
                 </span>
               </div>
 
+              {/* --- 3. MODIFICAR SECCIÓN DE ACCIONES --- */}
               <div className={styles.actions}>
                 <button
                   onClick={() => setSelectedRecipe(favorite.recipe_data)}
@@ -208,6 +196,16 @@ const addToShoppingList = async (recipe: Recipe) => {
                 >
                   Ver Detalles
                 </button>
+                
+                {/* --- BOTÓN AÑADIDO --- */}
+                <button
+                  onClick={() => setCookingModeRecipe(favorite.recipe_data)}
+                  className={styles.cookBtn} // Necesitaremos añadir este estilo
+                >
+                  👨‍🍳 Modo Cocina
+                </button>
+                {/* --- FIN DE BOTÓN AÑADIDO --- */}
+
                 <button
                   onClick={() => openCalendarModal(favorite.recipe_data)}
                   className={styles.calendarBtn}
@@ -215,14 +213,12 @@ const addToShoppingList = async (recipe: Recipe) => {
                   📅
                 </button>
                 
-                {/* --- BOTÓN AÑADIDO --- */}
                 <button
                   onClick={() => addToShoppingList(favorite.recipe_data)}
                   className={styles.shoppingBtn}
                 >
                   🛒
                 </button>
-                {/* --- FIN DE BOTÓN AÑADIDO --- */}
 
                 <button
                   onClick={() => setShareRecipe(favorite.recipe_data)}
@@ -258,7 +254,6 @@ const addToShoppingList = async (recipe: Recipe) => {
               ×
             </button>
 
-            {/* --- 3. AÑADIR IMAGEN AL MODAL --- */}
             {selectedRecipe.imageUrl && (
               <div className={styles.modalImageContainer}>
                 <Image
@@ -270,7 +265,6 @@ const addToShoppingList = async (recipe: Recipe) => {
                 />
               </div>
             )}
-            {/* --- FIN DE IMAGEN AL MODAL --- */}
 
             <h2>{selectedRecipe.name}</h2>
             <p className={styles.description}>{selectedRecipe.description}</p>
@@ -324,8 +318,8 @@ const addToShoppingList = async (recipe: Recipe) => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]} // Evitar fechas pasadas
-              className={styles.dateInput} // Necesita estilos (ver paso sig.)
+              min={new Date().toISOString().split('T')[0]}
+              className={styles.dateInput}
             />
             <div className={styles.modalActions}>
               <button onClick={addToCalendar} className={styles.confirmBtn}>
@@ -346,6 +340,14 @@ const addToShoppingList = async (recipe: Recipe) => {
         <ShareRecipe
           recipe={shareRecipe}
           onClose={() => setShareRecipe(null)}
+        />
+      )}
+
+      {/* --- 4. AÑADIR RENDERIZADO DEL MODAL --- */}
+      {cookingModeRecipe && (
+        <CookingMode
+          recipe={cookingModeRecipe}
+          onClose={() => setCookingModeRecipe(null)}
         />
       )}
     </div>

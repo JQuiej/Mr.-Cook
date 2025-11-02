@@ -350,6 +350,35 @@
   flex-wrap: wrap; /* Importante para que quepan todos los botones */
 }
 /* --- FIN DE ESTILOS DE MODAL DE CALENDARIO --- */
+/* ... (pega esto al final de favorites.module.css) ... */
+
+/* Estilo para el nuevo botón "Modo Cocina" */
+.cookBtn {
+  flex: 1;
+  padding: 0.625rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  white-space: nowrap; /* Evita que el texto se parta en dos líneas */
+}
+
+.cookBtn:hover {
+  background: var(--primary-hover);
+}
+
+/* Ajuste para que los botones con texto quepan bien */
+.actions {
+  flex-wrap: wrap; /* Asegura que los botones pasen a la línea de abajo si no caben */
+}
+
+.viewBtn,
+.cookBtn {
+  min-width: 120px; /* Dales un ancho mínimo */
+}
 
 @media (max-width: 768px) {
   .grid {
