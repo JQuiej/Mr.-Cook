@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateRecipes } from '@/lib/groq';
 import { createClient } from '@/lib/supabase/server';
 import { Recipe } from '@/lib/types';
-import { addPhotosToRecipes } from '@/lib/Huggingface';
+import { addPhotosToRecipes } from '@/lib/unsplash';
 import { saveSearchToHistory } from '@/lib/historyUtils'; // <-- 1. Importar la función
 
 export async function POST(request: NextRequest) {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       cuisine
     );
 
-    // 2. Enriquecer las recetas con fotos de Unsplash
+    // 2. Enriquecer las recetas con fotos
   const recipesWithPhotos = await addPhotosToRecipes(recipes);
 
     // --- 3. SECCIÓN CORREGIDA ---

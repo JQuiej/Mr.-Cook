@@ -27,7 +27,8 @@ export async function getPhotoForRecipe(recipe: Recipe): Promise<string | null> 
 
   try {
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
+      // ALTERNATIVA (MÁS CALIDAD)
+          'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5',
       {
         method: 'POST',
         headers: {
